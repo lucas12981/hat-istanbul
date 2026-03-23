@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lale Life PRO</title>
+<title>Lale Elite PRO</title>
 
 <style>
 :root{
@@ -14,56 +14,106 @@
 
 body{
 margin:0;
-font-family:'Arial';
+font-family:Arial;
 background:var(--bg);
 color:white;
 }
 
+/* SPLASH */
+#splash{
+position:fixed;
+inset:0;
+background:black;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:999;
+transition:1s;
+}
+
+#logo{
+font-size:32px;
+color:var(--gold);
+letter-spacing:5px;
+}
+
+/* LOGIN */
+#login{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:10px;
+}
+
+#login input{
+padding:10px;
+border-radius:10px;
+border:none;
+width:70%;
+}
+
+#login button{
+padding:10px;
+border:none;
+border-radius:10px;
+background:var(--gold);
+}
+
+/* APP */
+#app{
+opacity:0;
+transition:1s;
+}
+
+/* HEADER */
 header{
-text-align:center;
-padding:20px;
-font-size:22px;
-font-weight:bold;
-color:var(--gold);
-}
-
-.container{
+display:flex;
+justify-content:space-between;
 padding:15px;
+background:#111;
 }
 
-.card{
+header h2{color:var(--gold);}
+
+#logout{
+background:#222;
+border:none;
+color:white;
+padding:10px;
+border-radius:10px;
+transition:0.5s;
+}
+
+#logout.fade{
+opacity:0;
+transform:translateY(20px);
+}
+
+.container{padding:15px;}
+
+.section{
 background:var(--card);
-border-radius:18px;
-padding:18px;
+border-radius:15px;
+padding:15px;
 margin-bottom:15px;
-box-shadow:0 0 15px rgba(0,0,0,0.6);
-transition:0.3s;
-}
-
-.card:hover{
-transform:scale(1.02);
-}
-
-h3{
-margin-top:0;
-color:var(--gold);
 }
 
 button{
 width:100%;
-padding:14px;
-border:none;
-border-radius:12px;
-background:linear-gradient(45deg,var(--gold),#fff);
-font-weight:bold;
-cursor:pointer;
+padding:12px;
 margin-top:10px;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,var(--gold),#fff);
 }
 
 .result{
-margin-top:12px;
-font-size:14px;
-line-height:1.5;
+margin-top:10px;
 opacity:0;
 transform:translateY(10px);
 transition:0.4s;
@@ -74,148 +124,194 @@ opacity:1;
 transform:translateY(0);
 }
 
-input{
-width:100%;
-padding:10px;
-margin-top:8px;
-border-radius:10px;
-border:none;
-}
-
-.loader{
+/* CAMERA */
+#camera{
+display:none;
 position:fixed;
 inset:0;
 background:black;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:28px;
-z-index:999;
+z-index:9999;
+}
+
+video{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+#snap{
+position:absolute;
+bottom:40px;
+left:50%;
+transform:translateX(-50%);
+padding:15px;
+border-radius:50%;
+background:white;
 }
 </style>
 </head>
 
 <body>
 
-<div id="loader" class="loader">LALE</div>
+<!-- SPLASH -->
+<div id="splash">
+<div id="logo">LALE</div>
+<p>Elite Experience</p>
+</div>
 
-<header>🌷 LALE LIFE PRO</header>
+<!-- LOGIN -->
+<div id="login">
+<h2>Giriş</h2>
+<input id="user" placeholder="Adın">
+<button onclick="login()">Giriş Yap</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<header>
+<h2>Lale Life</h2>
+<button id="logout" onclick="logout()">Çıkış</button>
+</header>
 
 <div class="container">
 
-<!-- FAL -->
-<div class="card">
-<h3>☕ Kahve Falı</h3>
-<button onclick="fal()">Falına Bak</button>
+<div class="section">
+<h3>☕ Kahve Falı (Kamera)</h3>
+<button onclick="openCamera()">Fotoğraf Çek</button>
 <div id="fal" class="result"></div>
 </div>
 
-<!-- ECZANE -->
-<div class="card">
-<h3>🏥 Nöbetçi Eczane</h3>
-<button onclick="eczane()">Konuma Göre Bul</button>
-</div>
-
-<!-- DESTINO -->
-<div class="card">
+<div class="section">
 <h3>🧿 Günlük Mesaj</h3>
-<button onclick="kader()">Mesaj Al</button>
+<button onclick="kader()">Mesaj</button>
 <div id="kader" class="result"></div>
 </div>
 
-<!-- AMOR -->
-<div class="card">
-<h3>❤️ Aşk Uyumu</h3>
+<div class="section">
+<h3>❤️ Aşk</h3>
 <input id="n1" placeholder="Adın">
 <input id="n2" placeholder="Onun adı">
 <button onclick="ask()">Hesapla</button>
 <div id="ask" class="result"></div>
 </div>
 
+<div class="section">
+<h3>🏥 Eczane</h3>
+<button onclick="eczane()">Bul</button>
+</div>
+
+</div>
+</div>
+
+<!-- CAMERA -->
+<div id="camera">
+<video id="video" autoplay></video>
+<button id="snap" onclick="takePhoto()">📸</button>
 </div>
 
 <script>
 
-// LOADER
+// SPLASH
 setTimeout(()=>{
-document.getElementById("loader").style.display="none";
-},1500);
+document.getElementById("splash").style.display="none";
+},2000);
 
-// ☕ FAL PRO
-function fal(){
-const zones=[
-"açık bir yol",
-"kuş figürü",
-"kalp şekli",
-"yoğun gölge",
-"halka",
-"iki yol ayrımı"
-];
+// LOGIN
+function login(){
+const name=document.getElementById("user").value;
+if(!name){alert("Ad gir");return;}
 
-let selected=[];
-for(let i=0;i<3;i++){
-selected.push(zones[Math.floor(Math.random()*zones.length)]);
+localStorage.setItem("user",name);
+document.getElementById("login").style.display="none";
+document.getElementById("app").style.opacity="1";
 }
 
-let text="Fincanında "+selected.join(", ")+" görüyorum. ";
-
-if(text.includes("yol")) text+="Hayatında yeni bir başlangıç var. ";
-if(text.includes("kuş")) text+="Beklediğin haber geliyor. ";
-if(text.includes("kalp")) text+="Aşk hayatın hareketleniyor. ";
-if(text.includes("gölge")) text+="Sıkıntılar bitmek üzere. ";
-if(text.includes("halka")) text+="Para ve kısmet görünüyor. ";
-if(text.includes("iki")) text+="Önemli bir karar vereceksin. ";
-
-text+="Kısmetin açık.";
-
-show("fal",text);
+// LOGOUT
+function logout(){
+const btn=document.getElementById("logout");
+btn.classList.add("fade");
+setTimeout(()=>{
+location.reload();
+},800);
 }
 
-// 🏥 ECZANE
-function eczane(){
-navigator.geolocation.getCurrentPosition(pos=>{
-const lat=pos.coords.latitude;
-const lon=pos.coords.longitude;
-window.open(`https://www.google.com/maps/search/eczane/@${lat},${lon},15z`);
+// CAMERA
+let stream;
+
+function openCamera(){
+navigator.mediaDevices.getUserMedia({video:true})
+.then(s=>{
+stream=s;
+document.getElementById("video").srcObject=s;
+document.getElementById("camera").style.display="block";
 });
 }
 
-// 🧿 DESTINO
+function takePhoto(){
+stream.getTracks().forEach(t=>t.stop());
+document.getElementById("camera").style.display="none";
+
+generateFal();
+}
+
+// FAL INTELIGENTE
+function generateFal(){
+const patterns=["yol","kalp","kuş","halka","gölge"];
+
+let txt="Fincan analiz ediliyor... ";
+
+setTimeout(()=>{
+let p=patterns[Math.floor(Math.random()*patterns.length)];
+
+if(p=="yol") txt="Yeni başlangıç var.";
+if(p=="kalp") txt="Aşk geliyor.";
+if(p=="kuş") txt="Haber geliyor.";
+if(p=="halka") txt="Para geliyor.";
+if(p=="gölge") txt="Sorunlar bitiyor.";
+
+show("fal",txt);
+speak(txt);
+
+},1000);
+}
+
+// VOZ
+function speak(text){
+const speech=new SpeechSynthesisUtterance(text);
+speech.lang="tr-TR";
+speechSynthesis.speak(speech);
+}
+
+// MENSAJE
 function kader(){
-const list=[
-"Bugün önemli bir gün olabilir.",
-"Bir fırsat seni bekliyor.",
-"Sabırla ilerle.",
-"Kalbini dinle.",
-"Şans senden yana."
-];
-
-show("kader",list[Math.floor(Math.random()*list.length)]);
+const list=["Şans senden yana","Bugün önemli","Fırsat geliyor"];
+show("kader",list[Math.random()*list.length|0]);
 }
 
-// ❤️ AMOR
+// AMOR
 function ask(){
-const a=document.getElementById("n1").value;
-const b=document.getElementById("n2").value;
+const a=n1.value,b=n2.value;
+if(!a||!b)return;
 
-if(!a||!b){alert("İsim gir");return;}
-
-const score=Math.floor(Math.random()*100);
-
-let txt="";
-if(score>80) txt="Mükemmel uyum 💖";
-else if(score>50) txt="Güzel bağ 💕";
-else txt="Zor ama mümkün 💔";
-
-show("ask",`${a} ❤️ ${b} = %${score} → ${txt}`);
+let s=Math.floor(Math.random()*100);
+show("ask",`${a} ❤️ ${b} = %${s}`);
 }
 
-// UI ANIMACIÓN
-function show(id,text){
-const el=document.getElementById(id);
-el.innerText=text;
+// ECZANE
+function eczane(){
+navigator.geolocation.getCurrentPosition(p=>{
+window.open(`https://www.google.com/maps/search/eczane/@${p.coords.latitude},${p.coords.longitude}`);
+});
+}
+
+// UI
+function show(id,t){
+let el=document.getElementById(id);
+el.innerText=t;
 el.classList.add("show");
 }
+
 </script>
 
 </body>
