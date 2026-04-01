@@ -1,318 +1,215 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lale Elite PRO</title>
+<!-- ===== 🚢 FERRY EXPERIENCE PRO COMPLETO ===== -->
 
-<style>
-:root{
---gold:#FFD700;
---bg:#0b0b0b;
---card:#1a1a1a;
-}
+<!-- Leaflet (MAPA GRATIS REAL) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-body{
-margin:0;
-font-family:Arial;
-background:var(--bg);
-color:white;
-}
-
-/* SPLASH */
-#splash{
-position:fixed;
-inset:0;
-background:black;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:999;
-transition:1s;
-}
-
-#logo{
-font-size:32px;
-color:var(--gold);
-letter-spacing:5px;
-}
-
-/* LOGIN */
-#login{
-position:fixed;
-inset:0;
-background:#000;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-gap:10px;
-}
-
-#login input{
-padding:10px;
-border-radius:10px;
+<!-- BOTÓN -->
+<button onclick="startFerryExperience()" style="
+background:#ff0000;
+color:#fff;
 border:none;
-width:70%;
-}
+padding:14px 20px;
+border-radius:14px;
+font-size:15px;
+cursor:pointer;
+margin:10px;
+box-shadow:0 0 15px rgba(255,0,0,0.6);
+transition:0.3s;
+">
+🚢 En Yakın Vapur
+</button>
 
-#login button{
-padding:10px;
-border:none;
-border-radius:10px;
-background:var(--gold);
-}
-
-/* APP */
-#app{
-opacity:0;
-transition:1s;
-}
-
-/* HEADER */
-header{
-display:flex;
-justify-content:space-between;
-padding:15px;
-background:#111;
-}
-
-header h2{color:var(--gold);}
-
-#logout{
-background:#222;
-border:none;
-color:white;
-padding:10px;
-border-radius:10px;
-transition:0.5s;
-}
-
-#logout.fade{
-opacity:0;
-transform:translateY(20px);
-}
-
-.container{padding:15px;}
-
-.section{
-background:var(--card);
-border-radius:15px;
-padding:15px;
-margin-bottom:15px;
-}
-
-button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:10px;
-background:linear-gradient(45deg,var(--gold),#fff);
-}
-
-.result{
-margin-top:10px;
-opacity:0;
-transform:translateY(10px);
-transition:0.4s;
-}
-
-.result.show{
-opacity:1;
-transform:translateY(0);
-}
-
-/* CAMERA */
-#camera{
+<!-- CONTENEDOR FULLSCREEN -->
+<div id="ferryMapContainer" style="
 display:none;
 position:fixed;
-inset:0;
-background:black;
-z-index:9999;
-}
-
-video{
+top:0;
+left:0;
 width:100%;
 height:100%;
-object-fit:cover;
-}
+background:#000;
+z-index:9999;
+">
 
-#snap{
-position:absolute;
-bottom:40px;
-left:50%;
-transform:translateX(-50%);
-padding:15px;
-border-radius:50%;
-background:white;
-}
-</style>
-</head>
+  <div id="ferryMap" style="width:100%; height:100%;"></div>
 
-<body>
+  <!-- BOTÓN CERRAR -->
+  <button onclick="closeFerryMap()" style="
+  position:absolute;
+  top:20px;
+  right:20px;
+  background:#ff0000;
+  color:#fff;
+  border:none;
+  padding:10px 12px;
+  border-radius:10px;
+  z-index:10000;
+  font-size:14px;
+  ">
+  ✖
+  </button>
 
-<!-- SPLASH -->
-<div id="splash">
-<div id="logo">LALE</div>
-<p>Elite Experience</p>
-</div>
-
-<!-- LOGIN -->
-<div id="login">
-<h2>Giriş</h2>
-<input id="user" placeholder="Adın">
-<button onclick="login()">Giriş Yap</button>
-</div>
-
-<!-- APP -->
-<div id="app">
-
-<header>
-<h2>Lale Life</h2>
-<button id="logout" onclick="logout()">Çıkış</button>
-</header>
-
-<div class="container">
-
-<div class="section">
-<h3>☕ Kahve Falı (Kamera)</h3>
-<button onclick="openCamera()">Fotoğraf Çek</button>
-<div id="fal" class="result"></div>
-</div>
-
-<div class="section">
-<h3>🧿 Günlük Mesaj</h3>
-<button onclick="kader()">Mesaj</button>
-<div id="kader" class="result"></div>
-</div>
-
-<div class="section">
-<h3>❤️ Aşk</h3>
-<input id="n1" placeholder="Adın">
-<input id="n2" placeholder="Onun adı">
-<button onclick="ask()">Hesapla</button>
-<div id="ask" class="result"></div>
-</div>
-
-<div class="section">
-<h3>🏥 Eczane</h3>
-<button onclick="eczane()">Bul</button>
-</div>
-
-</div>
-</div>
-
-<!-- CAMERA -->
-<div id="camera">
-<video id="video" autoplay></video>
-<button id="snap" onclick="takePhoto()">📸</button>
 </div>
 
 <script>
+let ferryMap;
 
-// SPLASH
-setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-},2000);
+// ===== INICIAR =====
+function startFerryExperience() {
 
-// LOGIN
-function login(){
-const name=document.getElementById("user").value;
-if(!name){alert("Ad gir");return;}
+  if (!navigator.geolocation) {
+    alert("Konum desteklenmiyor");
+    return;
+  }
 
-localStorage.setItem("user",name);
-document.getElementById("login").style.display="none";
-document.getElementById("app").style.opacity="1";
+  showFerryMessage("📍 Konum alınıyor...");
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      openFerryMap(lat, lng);
+    },
+    () => {
+      alert("Konum alınamadı");
+    }
+  );
 }
 
-// LOGOUT
-function logout(){
-const btn=document.getElementById("logout");
-btn.classList.add("fade");
-setTimeout(()=>{
-location.reload();
-},800);
+// ===== ABRIR MAPA =====
+function openFerryMap(lat, lng) {
+
+  document.getElementById("ferryMapContainer").style.display = "block";
+
+  setTimeout(() => {
+
+    ferryMap = L.map('ferryMap', {
+      zoomControl: false
+    }).setView([lat, lng], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(ferryMap);
+
+    // marcador usuario
+    const userMarker = L.circleMarker([lat, lng], {
+      radius: 8,
+      color: "#fff",
+      fillColor: "#ff0000",
+      fillOpacity: 1
+    }).addTo(ferryMap);
+
+    userMarker.bindPopup("📍 Buradasın").openPopup();
+
+    // animación leve centrado
+    ferryMap.flyTo([lat, lng], 14);
+
+    searchNearbyFerries(lat, lng);
+
+  }, 300);
 }
 
-// CAMERA
-let stream;
+// ===== BUSCAR FERRYS =====
+function searchNearbyFerries(lat, lng) {
 
-function openCamera(){
-navigator.mediaDevices.getUserMedia({video:true})
-.then(s=>{
-stream=s;
-document.getElementById("video").srcObject=s;
-document.getElementById("camera").style.display="block";
-});
+  showFerryMessage("🚢 Vapur aranıyor...");
+
+  const query = `
+    [out:json];
+    node
+      ["amenity"="ferry_terminal"]
+      (around:4000, ${lat}, ${lng});
+    out;
+  `;
+
+  fetch("https://overpass-api.de/api/interpreter", {
+    method: "POST",
+    body: query
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (!data.elements.length) {
+      showFerryMessage("❗ Yakında vapur yok");
+      return;
+    }
+
+    data.elements.forEach((ferry, i) => {
+
+      const fLat = ferry.lat;
+      const fLng = ferry.lon;
+      const name = ferry.tags.name || "Vapur İskelesi";
+
+      setTimeout(() => {
+        L.marker([fLat, fLng]).addTo(ferryMap)
+          .bindPopup(`
+            <b>${name}</b><br><br>
+            <button onclick="goToFerry(${fLat}, ${fLng})" style="
+              background:#ff0000;
+              color:#fff;
+              border:none;
+              padding:6px 10px;
+              border-radius:8px;
+            ">
+            Git
+            </button>
+          `);
+      }, i * 200); // animación aparición
+
+    });
+
+    showFerryMessage("✅ Yakındaki vapurlar bulundu");
+
+  })
+  .catch(() => {
+    showFerryMessage("❌ Veri alınamadı");
+  });
 }
 
-function takePhoto(){
-stream.getTracks().forEach(t=>t.stop());
-document.getElementById("camera").style.display="none";
-
-generateFal();
+// ===== IR A MAPS =====
+function goToFerry(lat, lng) {
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
 }
 
-// FAL INTELIGENTE
-function generateFal(){
-const patterns=["yol","kalp","kuş","halka","gölge"];
+// ===== CERRAR =====
+function closeFerryMap() {
+  document.getElementById("ferryMapContainer").style.display = "none";
 
-let txt="Fincan analiz ediliyor... ";
-
-setTimeout(()=>{
-let p=patterns[Math.floor(Math.random()*patterns.length)];
-
-if(p=="yol") txt="Yeni başlangıç var.";
-if(p=="kalp") txt="Aşk geliyor.";
-if(p=="kuş") txt="Haber geliyor.";
-if(p=="halka") txt="Para geliyor.";
-if(p=="gölge") txt="Sorunlar bitiyor.";
-
-show("fal",txt);
-speak(txt);
-
-},1000);
+  if (ferryMap) {
+    ferryMap.remove();
+  }
 }
 
-// VOZ
-function speak(text){
-const speech=new SpeechSynthesisUtterance(text);
-speech.lang="tr-TR";
-speechSynthesis.speak(speech);
+// ===== MENSAJES =====
+function showFerryMessage(text) {
+
+  let box = document.getElementById("ferryMsg");
+
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "ferryMsg";
+
+    box.style.position = "fixed";
+    box.style.bottom = "20px";
+    box.style.left = "50%";
+    box.style.transform = "translateX(-50%)";
+    box.style.background = "rgba(0,0,0,0.85)";
+    box.style.color = "#fff";
+    box.style.padding = "12px 18px";
+    box.style.borderRadius = "14px";
+    box.style.zIndex = "10000";
+    box.style.fontSize = "14px";
+    box.style.boxShadow = "0 0 15px rgba(255,0,0,0.4)";
+    box.style.fontFamily = "sans-serif";
+  }
+
+  box.innerText = text;
+  document.body.appendChild(box);
+
+  setTimeout(() => {
+    box.remove();
+  }, 2500);
 }
-
-// MENSAJE
-function kader(){
-const list=["Şans senden yana","Bugün önemli","Fırsat geliyor"];
-show("kader",list[Math.random()*list.length|0]);
-}
-
-// AMOR
-function ask(){
-const a=n1.value,b=n2.value;
-if(!a||!b)return;
-
-let s=Math.floor(Math.random()*100);
-show("ask",`${a} ❤️ ${b} = %${s}`);
-}
-
-// ECZANE
-function eczane(){
-navigator.geolocation.getCurrentPosition(p=>{
-window.open(`https://www.google.com/maps/search/eczane/@${p.coords.latitude},${p.coords.longitude}`);
-});
-}
-
-// UI
-function show(id,t){
-let el=document.getElementById(id);
-el.innerText=t;
-el.classList.add("show");
-}
-
 </script>
-
-</body>
-</html>
