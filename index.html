@@ -14,6 +14,7 @@
             --text-main: #ffffff;
             --accent-gold: #ffcf5e;
             --glass-border: rgba(255, 255, 255, 0.1);
+            --error-red: #ff4b5c;
         }
 
         body, html {
@@ -23,6 +24,7 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
+            height: 100%;
         }
 
         #app {
@@ -52,7 +54,7 @@
             width: 80px;
             height: 80px;
             background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Basit Lale formu */
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             animation: pulse 2s infinite;
         }
 
@@ -108,6 +110,7 @@
             border-radius: 30px;
             padding: 25px;
             margin-bottom: 25px;
+            transition: 0.4s ease;
         }
 
         .input-label {
@@ -130,6 +133,7 @@
             margin-bottom: 20px;
             appearance: none;
             outline: none;
+            cursor: pointer;
         }
 
         .btn-luxury {
@@ -142,12 +146,14 @@
             font-weight: 800;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-luxury:active { transform: scale(0.97); }
+        .btn-luxury:active { transform: scale(0.96); }
 
         /* Vagon Görseli */
         .wagon-display {
@@ -167,13 +173,15 @@
             font-weight: bold;
             transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid transparent;
+            color: #555;
         }
 
         .wagon.active {
             background: var(--primary-neon);
             color: var(--bg-dark);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.5);
+            border-color: white;
         }
 
         /* Lale Pay Bölümü */
@@ -199,11 +207,61 @@
             border-radius: 4px;
         }
 
+        /* Custom Modal / Alert */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .modal-content {
+            background: #16171d;
+            border: 1px solid var(--glass-border);
+            padding: 35px;
+            border-radius: 35px;
+            width: 80%;
+            max-width: 320px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+
+        .modal-btn {
+            margin-top: 25px;
+            padding: 15px 40px;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+        }
+
         .hidden { display: none; }
 
     </style>
 </head>
 <body>
+
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+            <h3 style="margin:0; font-size: 1.4rem;">Eksik Seçim</h3>
+            <p style="color: #888; margin-top: 10px; font-size: 0.9rem;">Lütfen devam etmek için bir istasyon ve hedef belirleyin.</p>
+            <button class="modal-btn" onclick="closeModal()">TAMAM</button>
+        </div>
+    </div>
 
     <div id="loader" class="loader-screen">
         <div class="lale-logo"></div>
@@ -216,7 +274,7 @@
                 <img src="https://via.placeholder.com/150" alt="Profil" class="avatar" id="user-photo">
                 <div>
                     <span class="welcome-text" id="greeting-text">Yükleniyor...</span>
-                    <span class="user-name">Hoş Geldiniz</span>
+                    <span class="user-name">Kullanıcı Profili</span>
                 </div>
             </div>
             <div style="color: var(--primary-neon); font-weight: 900; font-size: 1.5rem;">HAT</div>
@@ -241,12 +299,12 @@
                     <option value="metrobus">Metrobüs</option>
                 </select>
 
-                <button onclick="calculateRoute()" class="btn-luxury">ROTA ANALİZİ YAP</button>
+                <button id="main-action-btn" onclick="calculateRoute()" class="btn-luxury">EN HIZLI YOLU BUL</button>
             </section>
 
             <div id="result-card" class="glass-card hidden">
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <span style="color: var(--accent-gold); font-size: 0.9rem; font-weight: bold;">⚡ ÖNERİLEN KONUM</span>
+                    <span style="color: var(--accent-gold); font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">⚡ OPTİMİZE EDİLMİŞ KONUM</span>
                 </div>
                 <div class="wagon-display">
                     <div class="wagon" id="w1">1</div>
@@ -254,9 +312,9 @@
                     <div class="wagon" id="w3">3</div>
                     <div class="wagon" id="w4">4</div>
                 </div>
-                <p id="instruction-text" style="text-align: center; font-size: 0.9rem; line-height: 1.6; color: #ddd;"></p>
-                <div style="text-align: center; color: var(--primary-neon); font-size: 1.2rem; font-weight: 800; margin-top: 15px;">
-                    +<span id="minutes">0</span> DK TASARRUF
+                <p id="instruction-text" style="text-align: center; font-size: 0.95rem; line-height: 1.6; color: #eee; padding: 0 10px;"></p>
+                <div style="text-align: center; color: var(--primary-neon); font-size: 1.3rem; font-weight: 900; margin-top: 15px;">
+                    +<span id="minutes">0</span> DAKİKA KAZANÇ
                 </div>
             </div>
 
@@ -270,20 +328,34 @@
                             <div style="font-weight: bold; font-size: 1.1rem;">142.50 ₺</div>
                         </div>
                     </div>
-                    <button style="background:none; border: 1px solid var(--primary-neon); color: var(--primary-neon); padding: 8px 15px; border-radius: 10px; font-size: 0.7rem;">YÜKLE</button>
+                    <button style="background:none; border: 1px solid var(--primary-neon); color: var(--primary-neon); padding: 8px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">YÜKLE</button>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
+        // Gerçek Optimizasyon Verileri
         const stationData = {
-            "yenikapi-vapur": { wagon: 1, text: "En ön vagonu kullanın. İDO/Vapur çıkış kapısı tam karşınıza gelecek.", save: 6 },
-            "yenikapi-marmaray": { wagon: 4, text: "En arka vagonu seçin. Marmaray aktarma tüneli doğrudan bu noktada.", save: 4 },
-            "gayrettepe-metrobus": { wagon: 2, text: "2. vagonda kalın. Metrobüs bağlantı asansörleri burada bekliyor.", save: 9 },
-            "uskudar-vapur": { wagon: 1, text: "1. vagonu tercih edin. İskele çıkışı için en kısa mesafe burası.", save: 5 },
-            "levent-metrobus": { wagon: 4, text: "En son vagonu kullanın. Metrobüs ve AVM çıkışlarına en yakın nokta.", save: 7 }
+            "yenikapi-vapur": { wagon: 1, text: "En ön vagonu kullanın. İDO/Vapur çıkış kapısı tam karşınıza gelecek ve kalabalığı baypas edeceksiniz.", save: 6 },
+            "yenikapi-marmaray": { wagon: 4, text: "En arka vagonu seçin. Marmaray aktarma tüneli doğrudan bu noktada başlar.", save: 4 },
+            "gayrettepe-metrobus": { wagon: 2, text: "2. vagonda kalın. Metrobüs bağlantı asansörleri ve yürüyen bantlar burada sizi bekliyor.", save: 9 },
+            "uskudar-vapur": { wagon: 1, text: "1. vagonu tercih edin. İskele çıkışı için en kısa yürüme mesafesi burasıdır.", save: 5 },
+            "uskudar-marmaray": { wagon: 2, text: "2. vagona binin. Marmaray aktarma holüne giden ana merdivenlerin tam önü.", save: 4 },
+            "levent-metrobus": { wagon: 4, text: "En son vagonu kullanın. Zincirlikuyu/Metrobüs ve AVM çıkışlarına en yakın nokta.", save: 7 }
         };
+
+        function showModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
 
         function updateGreeting() {
             const hour = new Date().getHours();
@@ -305,23 +377,38 @@
         function calculateRoute() {
             const origin = document.getElementById('origin-station').value;
             const target = document.getElementById('target-transport').value;
+            const btn = document.getElementById('main-action-btn');
             const key = `${origin}-${target}`;
             const card = document.getElementById('result-card');
             
-            document.querySelectorAll('.wagon').forEach(w => w.classList.remove('active'));
-
-            if (stationData[key]) {
-                const data = stationData[key];
-                card.classList.remove('hidden');
-                document.getElementById('instruction-text').innerText = data.text;
-                document.getElementById('minutes').innerText = data.save;
-                document.getElementById(`w${data.wagon}`).classList.add('active');
-                
-                // Scroll to result
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                alert("Lütfen geçerli bir rota seçiniz.");
+            // Seçim yapılmamışsa yeni modalı göster
+            if (!origin || !target) {
+                showModal();
+                return;
             }
+
+            // Buton Animasyonu (İşleniyor hissi)
+            btn.innerText = "ANALİZ EDİLİYOR...";
+            btn.style.opacity = "0.7";
+
+            setTimeout(() => {
+                document.querySelectorAll('.wagon').forEach(w => w.classList.remove('active'));
+                btn.innerText = "EN HIZLI YOLU BUL";
+                btn.style.opacity = "1";
+
+                if (stationData[key]) {
+                    const data = stationData[key];
+                    card.classList.remove('hidden');
+                    document.getElementById('instruction-text').innerText = data.text;
+                    document.getElementById('minutes').innerText = data.save;
+                    document.getElementById(`w${data.wagon}`).classList.add('active');
+                    
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    // Veri bulunamadığında da şık bir geri bildirim
+                    alert("Bu rota için optimizasyon çalışması devam ediyor.");
+                }
+            }, 800);
         }
     </script>
 </body>
