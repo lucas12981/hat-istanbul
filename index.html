@@ -3,299 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAT | İstanbul Bağlantı</title>
+    <title>HAT | Premium İstanbul Bağlantısı</title>
     
     <style>
         :root {
             --primary-neon: #00f2ff;
-            --bg-white: #ffffff;
-            --text-dark: #1a1a1a;
-            --gray-light: #f4f4f4;
-            --accent-red: #ff4b5c;
+            --secondary-neon: #7000ff;
+            --bg-dark: #0a0b10;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #ffffff;
+            --accent-gold: #ffcf5e;
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-white);
-            color: var(--text-dark);
-            height: 100%;
-            display: flex;
-            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
         }
 
         #app {
             width: 100%;
             max-width: 450px;
-            background: white;
+            margin: 0 auto;
             min-height: 100vh;
+            background: radial-gradient(circle at top right, #1a1b25, #0a0b10);
             position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.05);
+            padding-bottom: 40px;
         }
 
-        /* Pantalla de Carga */
+        /* Yükleme Ekranı */
         .loader-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
+            background: var(--bg-dark);
             z-index: 1000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.5s ease;
+            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .neon-circle {
-            width: 60px; height: 60px;
-            border: 4px solid #eee;
-            border-top: 4px solid var(--primary-neon);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .lale-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Basit Lale formu */
+            animation: pulse 2s infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px var(--primary-neon)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--primary-neon)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px var(--primary-neon)); }
+        }
 
-        /* Header */
+        /* Header & Profil */
         header {
-            padding: 25px;
+            padding: 30px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #f0f0f0;
         }
 
-        .logo {
-            font-weight: 900;
-            font-size: 1.8rem;
-            letter-spacing: -1px;
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .logo span { color: var(--primary-neon); }
-
-        #greeting {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #888;
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 15px;
+            border: 2px solid var(--primary-neon);
+            object-fit: cover;
+            background: #222;
         }
 
-        /* Cuerpo Principal */
-        main {
-            padding: 20px;
+        .welcome-text {
+            font-size: 0.8rem;
+            color: #aaa;
         }
 
-        .search-box {
-            background: var(--gray-light);
+        .user-name {
+            font-weight: 700;
+            display: block;
+            font-size: 1rem;
+        }
+
+        /* Form Alanı */
+        .main-container {
+            padding: 0 20px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
             padding: 25px;
-            border-radius: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .subtitle {
-            margin-top: 0;
-            font-size: 0.85rem;
+        .input-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--primary-neon);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            padding: 18px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            appearance: none;
+            outline: none;
+        }
+
+        .btn-luxury {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(90deg, var(--primary-neon), var(--secondary-neon));
+            border: none;
+            border-radius: 18px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #666;
-            margin-bottom: 15px;
         }
 
-        .input-group select {
-            width: 100%;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 2px solid transparent;
-            border-radius: 14px;
-            background: white;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-        }
+        .btn-luxury:active { transform: scale(0.97); }
 
-        .input-group select:focus {
-            border-color: var(--primary-neon);
-        }
-
-        .btn-calculate {
-            width: 100%;
-            padding: 18px;
-            background: var(--text-dark);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        /* Resultados */
-        #result-card {
-            background: white;
-            border: 2px solid var(--primary-neon);
-            border-radius: 24px;
-            padding: 20px;
-            margin-top: 10px;
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .train-visual {
+        /* Vagon Görseli */
+        .wagon-display {
             display: flex;
-            gap: 8px;
-            justify-content: center;
+            gap: 10px;
             margin: 20px 0;
         }
 
         .wagon {
-            width: 22%;
-            height: 45px;
-            background: #eee;
+            flex: 1;
+            height: 50px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
             font-weight: bold;
-            color: #bbb;
-            transition: 0.5s;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid transparent;
         }
 
         .wagon.active {
             background: var(--primary-neon);
-            color: var(--text-dark);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            color: var(--bg-dark);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
         }
 
-        #instruction-text {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            text-align: center;
-            color: #444;
+        /* Lale Pay Bölümü */
+        .lale-pay-section {
+            margin-top: 30px;
         }
 
-        .time-save {
-            text-align: center;
+        .wallet-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #2c3e50, #000000);
+            padding: 20px;
+            border-radius: 20px;
             margin-top: 15px;
-            color: var(--accent-red);
-            font-weight: 800;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .istanbul-kart-icon {
+            width: 40px;
+            height: 25px;
+            background: #ff4b5c;
+            border-radius: 4px;
         }
 
         .hidden { display: none; }
 
-        /* Mapa Falso Futurista */
-        #map-placeholder {
-            height: 150px;
-            background: #f9f9f9;
-            margin-top: 30px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px dashed #ddd;
-            font-size: 0.8rem;
-            color: #aaa;
-            text-transform: uppercase;
-        }
     </style>
 </head>
 <body>
 
-    <div id="app">
-        <div id="loader" class="loader-screen">
-            <div class="neon-circle"></div>
-            <p style="font-weight: bold; letter-spacing: 2px;">HAT ISTANBUL</p>
-        </div>
+    <div id="loader" class="loader-screen">
+        <div class="lale-logo"></div>
+        <h2 style="margin-top:20px; letter-spacing: 5px; font-weight: 200;">İSTANBUL</h2>
+    </div>
 
+    <div id="app">
         <header>
-            <div class="logo">H<span>A</span>T</div>
-            <div id="greeting">Yükleniyor...</div>
+            <div class="user-profile">
+                <img src="https://via.placeholder.com/150" alt="Profil" class="avatar" id="user-photo">
+                <div>
+                    <span class="welcome-text" id="greeting-text">Yükleniyor...</span>
+                    <span class="user-name">Hoş Geldiniz</span>
+                </div>
+            </div>
+            <div style="color: var(--primary-neon); font-weight: 900; font-size: 1.5rem;">HAT</div>
         </header>
 
-        <main>
-            <section class="search-box">
-                <p class="subtitle">Bağlantı Optimizasyonu</p>
-                <div class="input-group">
-                    <select id="origin-station">
-                        <option value="">Metro İstasyonu Seçin</option>
-                        <option value="yenikapi">Yenikapı</option>
-                        <option value="gayrettepe">Gayrettepe</option>
-                        <option value="uskudar">Üsküdar</option>
-                        <option value="levent">Levent</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <select id="target-transport">
-                        <option value="">Aktarma Hedefi</option>
-                        <option value="vapur">Vapur (Ferry)</option>
-                        <option value="marmaray">Marmaray</option>
-                        <option value="metrobus">Metrobüs</option>
-                    </select>
-                </div>
-                <button onclick="calculateRoute()" class="btn-calculate">EN HIZLI YOLU BUL</button>
+        <main class="main-container">
+            <section class="glass-card">
+                <span class="input-label">Nereden?</span>
+                <select id="origin-station">
+                    <option value="">İstasyon Seçiniz</option>
+                    <option value="yenikapi">Yenikapı</option>
+                    <option value="gayrettepe">Gayrettepe</option>
+                    <option value="uskudar">Üsküdar</option>
+                    <option value="levent">Levent</option>
+                </select>
+
+                <span class="input-label">Nereye Aktarma?</span>
+                <select id="target-transport">
+                    <option value="">Aktarma Seçiniz</option>
+                    <option value="vapur">Vapur (Ferry)</option>
+                    <option value="marmaray">Marmaray</option>
+                    <option value="metrobus">Metrobüs</option>
+                </select>
+
+                <button onclick="calculateRoute()" class="btn-luxury">ROTA ANALİZİ YAP</button>
             </section>
 
-            <div id="result-card" class="hidden">
-                <h4 style="text-align:center; margin:0; color:#888;">İDEAL VAGON</h4>
-                <div class="train-visual">
+            <div id="result-card" class="glass-card hidden">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <span style="color: var(--accent-gold); font-size: 0.9rem; font-weight: bold;">⚡ ÖNERİLEN KONUM</span>
+                </div>
+                <div class="wagon-display">
                     <div class="wagon" id="w1">1</div>
                     <div class="wagon" id="w2">2</div>
                     <div class="wagon" id="w3">3</div>
                     <div class="wagon" id="w4">4</div>
                 </div>
-                <p id="instruction-text"></p>
-                <div class="time-save">
-                    +<span id="minutes">0</span> DAKİKA KAZANÇ
+                <p id="instruction-text" style="text-align: center; font-size: 0.9rem; line-height: 1.6; color: #ddd;"></p>
+                <div style="text-align: center; color: var(--primary-neon); font-size: 1.2rem; font-weight: 800; margin-top: 15px;">
+                    +<span id="minutes">0</span> DK TASARRUF
                 </div>
             </div>
 
-            <div id="map-placeholder">
-                Canlı Bağlantı Haritası (Aktif)
-            </div>
+            <section class="lale-pay-section">
+                <span class="input-label">Lale Pay & İstanbul Kart</span>
+                <div class="wallet-card">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div class="istanbul-kart-icon"></div>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #888;">Bakiyeniz</div>
+                            <div style="font-weight: bold; font-size: 1.1rem;">142.50 ₺</div>
+                        </div>
+                    </div>
+                    <button style="background:none; border: 1px solid var(--primary-neon); color: var(--primary-neon); padding: 8px 15px; border-radius: 10px; font-size: 0.7rem;">YÜKLE</button>
+                </div>
+            </section>
         </main>
     </div>
 
     <script>
         const stationData = {
-            "yenikapi-vapur": { wagon: 1, text: "En ön vagona binin. İDO/Vapur çıkışı tam karşınızda olacak.", save: 6 },
-            "yenikapi-marmaray": { wagon: 4, text: "En arka vagona binin. Marmaray aktarma tüneli burada çok daha yakın.", save: 4 },
-            "gayrettepe-metrobus": { wagon: 2, text: "2. vagonda kalın. Metrobüs yürüme bandına giden asansörlerin tam önü.", save: 9 },
-            "uskudar-vapur": { wagon: 1, text: "1. vagonu seçin. Şehir Hatları iskelesine çıkış kapısı burada.", save: 5 },
-            "levent-metrobus": { wagon: 4, text: "En son vagonu kullanın. Plaza ve Metrobüs çıkışına en yakın nokta.", save: 7 }
+            "yenikapi-vapur": { wagon: 1, text: "En ön vagonu kullanın. İDO/Vapur çıkış kapısı tam karşınıza gelecek.", save: 6 },
+            "yenikapi-marmaray": { wagon: 4, text: "En arka vagonu seçin. Marmaray aktarma tüneli doğrudan bu noktada.", save: 4 },
+            "gayrettepe-metrobus": { wagon: 2, text: "2. vagonda kalın. Metrobüs bağlantı asansörleri burada bekliyor.", save: 9 },
+            "uskudar-vapur": { wagon: 1, text: "1. vagonu tercih edin. İskele çıkışı için en kısa mesafe burası.", save: 5 },
+            "levent-metrobus": { wagon: 4, text: "En son vagonu kullanın. Metrobüs ve AVM çıkışlarına en yakın nokta.", save: 7 }
         };
 
-        // Saludo según la hora
         function updateGreeting() {
             const hour = new Date().getHours();
-            const g = document.getElementById('greeting');
-            if (hour >= 5 && hour < 12) g.innerText = "Günaydın!";
-            else if (hour >= 12 && hour < 18) g.innerText = "İyi Günler!";
-            else g.innerText = "İyi Akşamlar!";
+            const gt = document.getElementById('greeting-text');
+            if (hour >= 5 && hour < 12) gt.innerText = "Günaydın";
+            else if (hour >= 12 && hour < 18) gt.innerText = "İyi Günler";
+            else gt.innerText = "İyi Akşamlar";
         }
 
-        // Simulación de carga
         window.addEventListener('load', () => {
             updateGreeting();
             setTimeout(() => {
                 const loader = document.getElementById('loader');
                 loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
-            }, 1800);
+                setTimeout(() => loader.style.display = 'none', 800);
+            }, 2000);
         });
 
-        // Función Principal
         function calculateRoute() {
             const origin = document.getElementById('origin-station').value;
             const target = document.getElementById('target-transport').value;
             const key = `${origin}-${target}`;
             const card = document.getElementById('result-card');
             
-            // Resetear vagones
             document.querySelectorAll('.wagon').forEach(w => w.classList.remove('active'));
 
             if (stationData[key]) {
@@ -304,8 +316,11 @@
                 document.getElementById('instruction-text').innerText = data.text;
                 document.getElementById('minutes').innerText = data.save;
                 document.getElementById(`w${data.wagon}`).classList.add('active');
+                
+                // Scroll to result
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
-                alert("Lütfen bir istasyon ve hedef seçin.");
+                alert("Lütfen geçerli bir rota seçiniz.");
             }
         }
     </script>
