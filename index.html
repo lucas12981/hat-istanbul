@@ -1,415 +1,609 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAT | Premium İstanbul Bağlantısı</title>
+    <title>IntelliSite-Visual | AI Safety Monitoring</title>
+    <meta name="description" content="Plataforma SaaS de monitoreo de seguridad industrial por visión artificial en tiempo real.">
     
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Configuración de Diseño (Design System) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#0F172A',        // Slate 900 (Fondo principal dashboard)
+                            surface: '#1E293B',   // Slate 800 (Tarjetas)
+                            accent: '#F97316',    // Orange 500 (Acción principal)
+                            accentHover: '#EA580C', // Orange 600
+                            success: '#10B981',   // Emerald 500
+                            warning: '#F59E0B',   // Amber 500
+                            danger: '#EF4444',    // Red 500
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scan 2s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --primary-neon: #00f2ff;
-            --secondary-neon: #7000ff;
-            --bg-dark: #0a0b10;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --text-main: #ffffff;
-            --accent-gold: #ffcf5e;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --error-red: #ff4b5c;
+        /* Estilos personalizados para efectos de Visión Artificial */
+        .bounding-box {
+            position: absolute;
+            border-width: 2px;
+            border-style: solid;
+            transition: all 0.3s ease;
         }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow-x: hidden;
-            height: 100%;
-        }
-
-        #app {
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: radial-gradient(circle at top right, #1a1b25, #0a0b10);
-            position: relative;
-            padding-bottom: 40px;
-        }
-
-        /* Yükleme Ekranı */
-        .loader-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .lale-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); filter: drop-shadow(0 0 0px var(--primary-neon)); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--primary-neon)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 0px var(--primary-neon)); }
-        }
-
-        /* Header & Profil */
-        header {
-            padding: 30px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 15px;
-            border: 2px solid var(--primary-neon);
-            object-fit: cover;
-            background: #222;
-        }
-
-        .welcome-text {
-            font-size: 0.8rem;
-            color: #aaa;
-        }
-
-        .user-name {
-            font-weight: 700;
-            display: block;
-            font-size: 1rem;
-        }
-
-        /* Form Alanı */
-        .main-container {
-            padding: 0 20px;
-        }
-
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 25px;
-            transition: 0.4s ease;
-        }
-
-        .input-label {
+        .bounding-box::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -24px;
+            left: -2px;
             font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--primary-neon);
-            margin-bottom: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px 4px 0 0;
+            color: white;
+        }
+        .box-safe { border-color: #10B981; background: rgba(16, 185, 129, 0.1); }
+        .box-safe::before { background: #10B981; }
+        
+        .box-danger { border-color: #EF4444; background: rgba(239, 68, 68, 0.15); animation: pulse 1.5s infinite; }
+        .box-danger::before { background: #EF4444; }
+
+        /* Efecto de escaneo de IA */
+        .ai-scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #F97316, transparent);
+            box-shadow: 0 0 10px #F97316;
+            animation: scan 3s linear infinite;
+            opacity: 0.6;
+        }
+
+        /* Transiciones de vista SPA */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .view-section.active {
             display: block;
         }
-
-        select {
-            width: 100%;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border);
-            padding: 18px;
-            border-radius: 15px;
-            color: white;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            appearance: none;
-            outline: none;
-            cursor: pointer;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .btn-luxury {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(90deg, var(--primary-neon), var(--secondary-neon));
-            border: none;
-            border-radius: 18px;
-            color: white;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-luxury:active { transform: scale(0.96); }
-
-        /* Vagon Görseli */
-        .wagon-display {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .wagon {
-            flex: 1;
-            height: 50px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid transparent;
-            color: #555;
-        }
-
-        .wagon.active {
-            background: var(--primary-neon);
-            color: var(--bg-dark);
-            transform: translateY(-8px);
-            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.5);
-            border-color: white;
-        }
-
-        /* Lale Pay Bölümü */
-        .lale-pay-section {
-            margin-top: 30px;
-        }
-
-        .wallet-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(135deg, #2c3e50, #000000);
-            padding: 20px;
-            border-radius: 20px;
-            margin-top: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .istanbul-kart-icon {
-            width: 40px;
-            height: 25px;
-            background: #ff4b5c;
-            border-radius: 4px;
-        }
-
-        /* Custom Modal / Alert */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: 0.3s;
-        }
-
-        .modal-content {
-            background: #16171d;
-            border: 1px solid var(--glass-border);
-            padding: 35px;
-            border-radius: 35px;
-            width: 80%;
-            max-width: 320px;
-            text-align: center;
-            transform: scale(0.8);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-overlay.show .modal-content { transform: scale(1); }
-
-        .modal-btn {
-            margin-top: 25px;
-            padding: 15px 40px;
-            background: white;
-            color: black;
-            border: none;
-            border-radius: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .hidden { display: none; }
-
+        /* Scrollbar minimalista */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-300">
 
-    <div id="custom-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
-            <h3 style="margin:0; font-size: 1.4rem;">Eksik Seçim</h3>
-            <p style="color: #888; margin-top: 10px; font-size: 0.9rem;">Lütfen devam etmek için bir istasyon ve hedef belirleyin.</p>
-            <button class="modal-btn" onclick="closeModal()">TAMAM</button>
+    <!-- Navegación Global -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-brand-bg/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('landing')">
+                    <div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center">
+                        <i data-lucide="eye" class="text-white w-5 h-5"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white">IntelliSite<span class="text-brand-accent">-Visual</span></span>
+                </div>
+
+                <!-- Links de Navegación -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="navigateTo('landing')" class="nav-link text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-accent dark:hover:text-brand-accent transition-colors" data-i18n="nav_landing">Inicio</button>
+                    <button onclick="navigateTo('dashboard')" class="nav-link text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-accent dark:hover:text-brand-accent transition-colors" data-i18n="nav_dashboard">Dashboard</button>
+                    <button onclick="navigateTo('config')" class="nav-link text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-accent dark:hover:text-brand-accent transition-colors" data-i18n="nav_config">Configuración</button>
+                </div>
+
+                <!-- Selector de Idioma y CTA -->
+                <div class="flex items-center gap-4">
+                    <select id="lang-selector" onchange="changeLanguage(this.value)" class="bg-transparent text-sm font-medium text-slate-600 dark:text-slate-300 border-none focus:ring-0 cursor-pointer">
+                        <option value="es">🇪🇸 ES</option>
+                        <option value="en">🇺🇸 EN</option>
+                        <option value="tr">🇹🇷 TR</option>
+                    </select>
+                    <button onclick="navigateTo('dashboard')" class="hidden sm:flex bg-brand-accent hover:bg-brand-accentHover text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-brand-accent/20">
+                        <span data-i18n="cta_pilot">Piloto Gratuito</span>
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </nav>
 
-    <div id="loader" class="loader-screen">
-        <div class="lale-logo"></div>
-        <h2 style="margin-top:20px; letter-spacing: 5px; font-weight: 200;">İSTANBUL</h2>
-    </div>
+    <!-- ========================================== -->
+    <!-- VISTA 1: LANDING PAGE (Pública) -->
+    <!-- ========================================== -->
+    <section id="view-landing" class="view-section active pt-16">
+        <!-- Hero Section -->
+        <div class="relative bg-white dark:bg-brand-bg overflow-hidden">
+            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1504307651254-35680f356f0e?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10 dark:opacity-20"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/10 text-brand-accent text-xs font-bold uppercase tracking-wider mb-6 border border-brand-accent/20">
+                    <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse"></span>
+                    <span data-i18n="hero_badge">Tecnología de Visión Artificial v2.0</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight">
+                    <span data-i18n="hero_title_1">Inteligencia Artificial que</span><br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-orange-400" data-i18n="hero_title_2">Protege tu Obra en Tiempo Real</span>
+                </h1>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600 dark:text-slate-400 mb-10" data-i18n="hero_subtitle">
+                    Monitoreo autónomo de seguridad industrial. Detecta infracciones, previene accidentes y reduce costos de seguros globalmente. Sin hardware propietario, usa tus cámaras existentes.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="navigateTo('dashboard')" class="bg-brand-accent hover:bg-brand-accentHover text-white px-8 py-4 rounded-xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 hover:scale-105 flex items-center justify-center gap-2">
+                        <span data-i18n="cta_pilot_full">Iniciar Piloto Gratuito de 15 días</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                    <button class="bg-white dark:bg-brand-surface text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 px-8 py-4 rounded-xl text-lg font-semibold transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i>
+                        <span data-i18n="cta_demo">Ver Demo en Vivo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    <div id="app">
-        <header>
-            <div class="user-profile">
-                <img src="https://via.placeholder.com/150" alt="Profil" class="avatar" id="user-photo">
+        <!-- Características Clave -->
+        <div class="bg-slate-50 dark:bg-brand-surface/50 py-24 border-t border-slate-200 dark:border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="bg-white dark:bg-brand-bg p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="camera" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3" data-i18n="feat_1_title">Cero Hardware Propietario</h3>
+                        <p class="text-slate-600 dark:text-slate-400" data-i18n="feat_1_desc">Conecta cualquier cámara IP o flujo RTSP existente. Nuestra IA se adapta a tu infraestructura actual sin costos de instalación.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="bg-white dark:bg-brand-bg p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-brand-accent/10 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-brand-accent"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3" data-i18n="feat_2_title">Detección Universal</h3>
+                        <p class="text-slate-600 dark:text-slate-400" data-i18n="feat_2_desc">Algoritmos entrenados para detectar cascos, chalecos, arneses y violaciones de perímetros de seguridad con 99.2% de precisión.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="bg-white dark:bg-brand-bg p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="bell-ring" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3" data-i18n="feat_3_title">Alertas Instantáneas</h3>
+                        <p class="text-slate-600 dark:text-slate-400" data-i18n="feat_3_desc">Notificaciones push, SMS o WhatsApp globales en milisegundos cuando se detecta una infracción crítica de seguridad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VISTA 2: DASHBOARD DEL SUPERVISOR (Privado) -->
+    <!-- ========================================== -->
+    <section id="view-dashboard" class="view-section pt-16 min-h-screen bg-brand-bg text-slate-100">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Header del Dashboard -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <span class="welcome-text" id="greeting-text">Yükleniyor...</span>
-                    <span class="user-name">Kullanıcı Profili</span>
+                    <h2 class="text-2xl font-bold text-white" data-i18n="dash_title">Panel de Control de Obra</h2>
+                    <p class="text-slate-400 text-sm mt-1">Proyecto: <span class="text-brand-accent font-semibold">Torre Residencial Norte - Fase 3</span></p>
                 </div>
-            </div>
-            <div style="color: var(--primary-neon); font-weight: 900; font-size: 1.5rem;">HAT</div>
-        </header>
-
-        <main class="main-container">
-            <section class="glass-card">
-                <span class="input-label">Nereden?</span>
-                <select id="origin-station">
-                    <option value="">İstasyon Seçiniz</option>
-                    <option value="yenikapi">Yenikapı</option>
-                    <option value="gayrettepe">Gayrettepe</option>
-                    <option value="uskudar">Üsküdar</option>
-                    <option value="levent">Levent</option>
-                </select>
-
-                <span class="input-label">Nereye Aktarma?</span>
-                <select id="target-transport">
-                    <option value="">Aktarma Seçiniz</option>
-                    <option value="vapur">Vapur (Ferry)</option>
-                    <option value="marmaray">Marmaray</option>
-                    <option value="metrobus">Metrobüs</option>
-                </select>
-
-                <button id="main-action-btn" onclick="calculateRoute()" class="btn-luxury">EN HIZLI YOLU BUL</button>
-            </section>
-
-            <div id="result-card" class="glass-card hidden">
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <span style="color: var(--accent-gold); font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">⚡ OPTİMİZE EDİLMİŞ KONUM</span>
-                </div>
-                <div class="wagon-display">
-                    <div class="wagon" id="w1">1</div>
-                    <div class="wagon" id="w2">2</div>
-                    <div class="wagon" id="w3">3</div>
-                    <div class="wagon" id="w4">4</div>
-                </div>
-                <p id="instruction-text" style="text-align: center; font-size: 0.95rem; line-height: 1.6; color: #eee; padding: 0 10px;"></p>
-                <div style="text-align: center; color: var(--primary-neon); font-size: 1.3rem; font-weight: 900; margin-top: 15px;">
-                    +<span id="minutes">0</span> DAKİKA KAZANÇ
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-2 px-3 py-1 rounded-full bg-brand-success/10 text-brand-success text-xs font-bold border border-brand-success/20">
+                        <span class="w-2 h-2 rounded-full bg-brand-success animate-pulse"></span>
+                        <span data-i18n="system_online">SISTEMA ONLINE</span>
+                    </span>
+                    <button class="p-2 rounded-lg bg-brand-surface hover:bg-slate-700 transition-colors border border-slate-700">
+                        <i data-lucide="settings" class="w-5 h-5 text-slate-400"></i>
+                    </button>
                 </div>
             </div>
 
-            <section class="lale-pay-section">
-                <span class="input-label">Lale Pay & İstanbul Kart</span>
-                <div class="wallet-card">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div class="istanbul-kart-icon"></div>
-                        <div>
-                            <div style="font-size: 0.8rem; color: #888;">Bakiyeniz</div>
-                            <div style="font-weight: bold; font-size: 1.1rem;">142.50 ₺</div>
+            <!-- KPIs Superiores -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-brand-surface p-6 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-1" data-i18n="kpi_cameras">Cámaras Activas</p>
+                        <h3 class="text-3xl font-bold text-white">12 <span class="text-sm font-normal text-slate-500">/ 12</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-brand-success/10 flex items-center justify-center">
+                        <i data-lucide="video" class="w-6 h-6 text-brand-success"></i>
+                    </div>
+                </div>
+                <div class="bg-brand-surface p-6 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-1" data-i18n="kpi_infractions">Infracciones Hoy</p>
+                        <h3 class="text-3xl font-bold text-brand-danger" id="infraction-count">3</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-brand-danger/10 flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-brand-danger"></i>
+                    </div>
+                </div>
+                <div class="bg-brand-surface p-6 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-1" data-i18n="kpi_safety">Índice de Seguridad</p>
+                        <h3 class="text-3xl font-bold text-brand-success">98.4%</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-brand-success/10 flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-brand-success"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layout Principal: Video Grid + Activity Log -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Grilla de Video (2/3 del ancho) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="layout-grid" class="w-5 h-5 text-brand-accent"></i>
+                            <span data-i18n="live_feeds">Transmisión en Vivo</span>
+                        </h3>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1 text-xs font-medium rounded bg-brand-surface border border-slate-700 text-slate-300 hover:text-white">2x2</button>
+                            <button class="px-3 py-1 text-xs font-medium rounded bg-brand-accent text-white">1x2</button>
                         </div>
                     </div>
-                    <button style="background:none; border: 1px solid var(--primary-neon); color: var(--primary-neon); padding: 8px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">YÜKLE</button>
-                </div>
-            </section>
-        </main>
-    </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Cámara 1 -->
+                        <div class="relative bg-black rounded-xl overflow-hidden border border-slate-700 aspect-video group">
+                            <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Camera Feed">
+                            
+                            <!-- Overlay de IA -->
+                            <div class="absolute inset-0 pointer-events-none">
+                                <div class="absolute top-4 left-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-brand-accent border border-brand-accent/30 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-brand-accent rounded-full animate-pulse"></span>
+                                    AI ANALYZING: CAM-01 (Norte)
+                                </div>
+                                
+                                <!-- Bounding Boxes Simulados -->
+                                <div class="bounding-box box-safe" style="top: 30%; left: 20%; width: 15%; height: 40%;" data-label="HELMET 98%"></div>
+                                <div class="bounding-box box-safe" style="top: 35%; left: 60%; width: 12%; height: 35%;" data-label="VEST 95%"></div>
+                                <div class="bounding-box box-danger" style="top: 50%; left: 75%; width: 18%; height: 45%;" data-label="NO HELMET 99%"></div>
+                                
+                                <!-- Línea de escaneo -->
+                                <div class="ai-scan-line"></div>
+                            </div>
+                        </div>
+
+                        <!-- Cámara 2 -->
+                        <div class="relative bg-black rounded-xl overflow-hidden border border-slate-700 aspect-video group">
+                            <img src="https://images.unsplash.com/photo-1590644365607-1c5a2e9e3818?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Camera Feed">
+                            
+                            <div class="absolute inset-0 pointer-events-none">
+                                <div class="absolute top-4 left-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-brand-accent border border-brand-accent/30 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-brand-accent rounded-full animate-pulse"></span>
+                                    AI ANALYZING: CAM-04 (Acceso)
+                                </div>
+                                
+                                <div class="bounding-box box-safe" style="top: 40%; left: 45%; width: 20%; height: 50%;" data-label="FULL PPE 97%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Lateral de Alertas (1/3 del ancho) -->
+                <div class="bg-brand-surface rounded-xl border border-slate-700/50 flex flex-col h-[600px]">
+                    <div class="p-4 border-b border-slate-700/50 flex justify-between items-center">
+                        <h3 class="font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="activity" class="w-4 h-4 text-brand-accent"></i>
+                            <span data-i18n="live_alerts">Alertas en Tiempo Real</span>
+                        </h3>
+                        <span class="text-xs text-slate-500" id="alert-timestamp">Actualizando...</span>
+                    </div>
+                    
+                    <div id="alert-feed" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
+                        <!-- Las alertas se inyectarán aquí vía JS -->
+                    </div>
+
+                    <div class="p-4 border-t border-slate-700/50 bg-brand-bg/50 rounded-b-xl">
+                        <button class="w-full py-2 rounded-lg border border-slate-600 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span data-i18n="export_log">Exportar Registro (CSV)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VISTA 3: CONFIGURACIÓN DE CÁMARAS -->
+    <!-- ========================================== -->
+    <section id="view-config" class="view-section pt-16 min-h-screen bg-slate-50 dark:bg-brand-bg">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white" data-i18n="config_title">Configuración de Cámaras</h2>
+                <p class="text-slate-600 dark:text-slate-400 mt-2" data-i18n="config_subtitle">Conecta nuevos flujos de video para que la IA comience a monitorear.</p>
+            </div>
+
+            <div class="bg-white dark:bg-brand-surface rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
+                <form onsubmit="event.preventDefault(); addCamera();" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" data-i18n="form_name">Nombre de la Cámara / Zona</label>
+                            <input type="text" placeholder="Ej. Entrada Principal, Piso 3" class="w-full bg-slate-50 dark:bg-brand-bg border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" data-i18n="form_country">País / Zona Horaria</label>
+                            <select class="w-full bg-slate-50 dark:bg-brand-bg border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all">
+                                <option>Argentina (ART, UTC-3)</option>
+                                <option>México (CST, UTC-6)</option>
+                                <option>España (CET, UTC+1)</option>
+                                <option>Turquía (TRT, UTC+3)</option>
+                                <option>Estados Unidos (EST, UTC-5)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" data-i18n="form_url">Enlace de Transmisión (RTSP / IP / Webcam)</label>
+                        <div class="relative">
+                            <i data-lucide="link" class="absolute left-3 top-3.5 w-5 h-5 text-slate-400"></i>
+                            <input type="url" placeholder="rtsp://admin:password@192.168.1.100:554/stream" class="w-full bg-slate-50 dark:bg-brand-bg border border-slate-300 dark:border-slate-600 rounded-lg pl-10 pr-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all font-mono text-sm" required>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2" data-i18n="form_help">Asegúrate de que la cámara sea accesible desde la red pública o tenga configurado el reenvío de puertos.</p>
+                    </div>
+
+                    <div class="pt-4 flex items-center justify-end gap-4">
+                        <button type="button" onclick="navigateTo('dashboard')" class="px-6 py-3 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-i18n="btn_cancel">Cancelar</button>
+                        <button type="submit" class="px-6 py-3 rounded-lg bg-brand-accent hover:bg-brand-accentHover text-white font-bold shadow-lg shadow-brand-accent/20 transition-all flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            <span data-i18n="btn_add">Añadir Cámara e Iniciar IA</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de cámaras existentes (Simulada) -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4" data-i18n="existing_cameras">Cámaras Conectadas</h3>
+                <div class="bg-white dark:bg-brand-surface rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div class="p-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-brand-success/10 flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-brand-success"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">CAM-01: Acceso Norte</p>
+                                <p class="text-xs text-slate-500">rtsp://192.168.1.10... • 1080p • 30fps</p>
+                            </div>
+                        </div>
+                        <button class="text-slate-400 hover:text-brand-danger transition-colors">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-brand-success/10 flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-brand-success"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">CAM-04: Zona de Carga</p>
+                                <p class="text-xs text-slate-500">rtsp://192.168.1.14... • 720p • 15fps</p>
+                            </div>
+                        </div>
+                        <button class="text-slate-400 hover:text-brand-danger transition-colors">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- LÓGICA JAVASCRIPT (SPA, i18n, Simulación IA) -->
+    <!-- ========================================== -->
     <script>
-        // Gerçek Optimizasyon Verileri
-        const stationData = {
-            "yenikapi-vapur": { wagon: 1, text: "En ön vagonu kullanın. İDO/Vapur çıkış kapısı tam karşınıza gelecek ve kalabalığı baypas edeceksiniz.", save: 6 },
-            "yenikapi-marmaray": { wagon: 4, text: "En arka vagonu seçin. Marmaray aktarma tüneli doğrudan bu noktada başlar.", save: 4 },
-            "gayrettepe-metrobus": { wagon: 2, text: "2. vagonda kalın. Metrobüs bağlantı asansörleri ve yürüyen bantlar burada sizi bekliyor.", save: 9 },
-            "uskudar-vapur": { wagon: 1, text: "1. vagonu tercih edin. İskele çıkışı için en kısa yürüme mesafesi burasıdır.", save: 5 },
-            "uskudar-marmaray": { wagon: 2, text: "2. vagona binin. Marmaray aktarma holüne giden ana merdivenlerin tam önü.", save: 4 },
-            "levent-metrobus": { wagon: 4, text: "En son vagonu kullanın. Zincirlikuyu/Metrobüs ve AVM çıkışlarına en yakın nokta.", save: 7 }
+        // 1. Inicialización de Iconos
+        lucide.createIcons();
+
+        // 2. Sistema de Enrutamiento SPA
+        function navigateTo(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Mostrar vista objetivo
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            
+            // Actualizar estado activo en navbar
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('text-brand-accent');
+                el.classList.add('text-slate-600', 'dark:text-slate-300');
+            });
+            
+            // Scroll al top
+            window.scrollTo(0, 0);
+
+            // Si vamos al dashboard, iniciar simulación si no está activa
+            if(viewId === 'dashboard' && !simulationInterval) {
+                startSimulation();
+            }
+        }
+
+        // 3. Sistema de Internacionalización (i18n)
+        const translations = {
+            es: {
+                nav_landing: "Inicio", nav_dashboard: "Dashboard", nav_config: "Configuración",
+                cta_pilot: "Piloto Gratuito", cta_pilot_full: "Iniciar Piloto Gratuito de 15 días", cta_demo: "Ver Demo en Vivo",
+                hero_badge: "Tecnología de Visión Artificial v2.0",
+                hero_title_1: "Inteligencia Artificial que", hero_title_2: "Protege tu Obra en Tiempo Real",
+                hero_subtitle: "Monitoreo autónomo de seguridad industrial. Detecta infracciones, previene accidentes y reduce costos de seguros globalmente. Sin hardware propietario, usa tus cámaras existentes.",
+                feat_1_title: "Cero Hardware Propietario", feat_1_desc: "Conecta cualquier cámara IP o flujo RTSP existente. Nuestra IA se adapta a tu infraestructura actual sin costos de instalación.",
+                feat_2_title: "Detección Universal", feat_2_desc: "Algoritmos entrenados para detectar cascos, chalecos, arneses y violaciones de perímetros de seguridad con 99.2% de precisión.",
+                feat_3_title: "Alertas Instantáneas", feat_3_desc: "Notificaciones push, SMS o WhatsApp globales en milisegundos cuando se detecta una infracción crítica de seguridad.",
+                dash_title: "Panel de Control de Obra", system_online: "SISTEMA ONLINE",
+                kpi_cameras: "Cámaras Activas", kpi_infractions: "Infracciones Hoy", kpi_safety: "Índice de Seguridad",
+                live_feeds: "Transmisión en Vivo", live_alerts: "Alertas en Tiempo Real", export_log: "Exportar Registro (CSV)",
+                config_title: "Configuración de Cámaras", config_subtitle: "Conecta nuevos flujos de video para que la IA comience a monitorear.",
+                form_name: "Nombre de la Cámara / Zona", form_country: "País / Zona Horaria", form_url: "Enlace de Transmisión (RTSP / IP / Webcam)",
+                form_help: "Asegúrate de que la cámara sea accesible desde la red pública o tenga configurado el reenvío de puertos.",
+                btn_cancel: "Cancelar", btn_add: "Añadir Cámara e Iniciar IA", existing_cameras: "Cámaras Conectadas"
+            },
+            en: {
+                nav_landing: "Home", nav_dashboard: "Dashboard", nav_config: "Configuration",
+                cta_pilot: "Free Pilot", cta_pilot_full: "Start 15-Day Free Pilot", cta_demo: "Watch Live Demo",
+                hero_badge: "Computer Vision Technology v2.0",
+                hero_title_1: "Artificial Intelligence that", hero_title_2: "Protects Your Site in Real Time",
+                hero_subtitle: "Autonomous industrial safety monitoring. Detects infractions, prevents accidents, and reduces insurance costs globally. No proprietary hardware, use your existing cameras.",
+                feat_1_title: "Zero Proprietary Hardware", feat_1_desc: "Connect any existing IP camera or RTSP stream. Our AI adapts to your current infrastructure with no installation costs.",
+                feat_2_title: "Universal Detection", feat_2_desc: "Algorithms trained to detect helmets, vests, harnesses, and safety perimeter violations with 99.2% accuracy.",
+                feat_3_title: "Instant Alerts", feat_3_desc: "Global push, SMS, or WhatsApp notifications in milliseconds when a critical safety infraction is detected.",
+                dash_title: "Site Control Panel", system_online: "SYSTEM ONLINE",
+                kpi_cameras: "Active Cameras", kpi_infractions: "Today's Infractions", kpi_safety: "Safety Index",
+                live_feeds: "Live Feeds", live_alerts: "Real-Time Alerts", export_log: "Export Log (CSV)",
+                config_title: "Camera Configuration", config_subtitle: "Connect new video streams for the AI to start monitoring.",
+                form_name: "Camera / Zone Name", form_country: "Country / Timezone", form_url: "Stream URL (RTSP / IP / Webcam)",
+                form_help: "Ensure the camera is accessible from the public network or has port forwarding configured.",
+                btn_cancel: "Cancel", btn_add: "Add Camera & Start AI", existing_cameras: "Connected Cameras"
+            },
+            tr: {
+                nav_landing: "Ana Sayfa", nav_dashboard: "Kontrol Paneli", nav_config: "Ayarlar",
+                cta_pilot: "Ücretsiz Deneme", cta_pilot_full: "15 Günlük Ücretsiz Denemeyi Başlat", cta_demo: "Canlı Demo İzle",
+                hero_badge: "Bilgisayarlı Görü Teknolojisi v2.0",
+                hero_title_1: "Şantiyenizi Gerçek Zamanlı", hero_title_2: "Koruyan Yapay Zeka",
+                hero_subtitle: "Otonom endüstriyel güvenlik izleme. İhlalleri tespit eder, kazaları önler ve küresel olarak sigorta maliyetlerini düşürür. Özel donanım yok, mevcut kameralarınızı kullanın.",
+                feat_1_title: "Sıfır Özel Donanım", feat_1_desc: "Mevcut herhangi bir IP kamerayı veya RTSP akışını bağlayın. Yapay zekamız, kurulum maliyeti olmadan mevcut altyapınıza uyum sağlar.",
+                feat_2_title: "Evrensel Tespit", feat_2_desc: "Baretleri, yelekleri, emniyet kemerlerini ve güvenlik çevresi ihlallerini %99.2 doğrulukla tespit etmek için eğitilmiş algoritmalar.",
+                feat_3_title: "Anlık Uyarılar", feat_3_desc: "Kritik bir güvenlik ihlali tespit edildiğinde milisaniyeler içinde küresel anlık bildirim, SMS veya WhatsApp bildirimleri.",
+                dash_title: "Şantiye Kontrol Paneli", system_online: "SİSTEM ÇEVRİMİÇİ",
+                kpi_cameras: "Aktif Kameralar", kpi_infractions: "Bugünkü İhlaller", kpi_safety: "Güvenlik Endeksi",
+                live_feeds: "Canlı Yayınlar", live_alerts: "Gerçek Zamanlı Uyarılar", export_log: "Günlüğü Dışa Aktar (CSV)",
+                config_title: "Kamera Yapılandırması", config_subtitle: "Yapay zekanın izlemeye başlaması için yeni video akışları bağlayın.",
+                form_name: "Kamera / Bölge Adı", form_country: "Ülke / Saat Dilimi", form_url: "Yayın URL'si (RTSP / IP / Webcam)",
+                form_help: "Kameranın genel ağdan erişilebilir olduğundan veya bağlantı noktası iletlemenin yapılandırıldığından emin olun.",
+                btn_cancel: "İptal", btn_add: "Kamera Ekle ve Yapay Zekayı Başlat", existing_cameras: "Bağlı Kameralar"
+            }
         };
 
-        function showModal() {
-            const modal = document.getElementById('custom-modal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
+        function changeLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            document.documentElement.lang = lang;
         }
 
-        function closeModal() {
-            const modal = document.getElementById('custom-modal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
+        // 4. Simulador de IA en Tiempo Real
+        let simulationInterval;
+        let infractionCount = 3;
 
-        function updateGreeting() {
-            const hour = new Date().getHours();
-            const gt = document.getElementById('greeting-text');
-            if (hour >= 5 && hour < 12) gt.innerText = "Günaydın";
-            else if (hour >= 12 && hour < 18) gt.innerText = "İyi Günler";
-            else gt.innerText = "İyi Akşamlar";
-        }
+        const alertTemplates = [
+            { type: 'danger', icon: 'alert-octagon', title: 'CRÍTICO: Operario sin casco', cam: 'Cámara Norte', action: 'Enviar WhatsApp al Capataz' },
+            { type: 'warning', icon: 'alert-triangle', title: 'PRECAUCIÓN: Sin chaleco reflectante', cam: 'Cámara Acceso', action: 'Notificar a Supervisor' },
+            { type: 'success', icon: 'check-circle', title: 'SEGURO: Ingreso con EPP completo', cam: 'Cámara Perimetral', action: 'Ver Registro' },
+            { type: 'danger', icon: 'alert-octagon', title: 'CRÍTICO: Intruso en zona restringida', cam: 'Cámara Almacén', action: 'Activar Protocolo' }
+        ];
 
-        window.addEventListener('load', () => {
-            updateGreeting();
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 800);
-            }, 2000);
-        });
-
-        function calculateRoute() {
-            const origin = document.getElementById('origin-station').value;
-            const target = document.getElementById('target-transport').value;
-            const btn = document.getElementById('main-action-btn');
-            const key = `${origin}-${target}`;
-            const card = document.getElementById('result-card');
+        function addAlertToLog() {
+            const template = alertTemplates[Math.floor(Math.random() * alertTemplates.length)];
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            // Seçim yapılmamışsa yeni modalı göster
-            if (!origin || !target) {
-                showModal();
-                return;
+            const colors = {
+                danger: 'text-brand-danger border-brand-danger/20 bg-brand-danger/5',
+                warning: 'text-brand-warning border-brand-warning/20 bg-brand-warning/5',
+                success: 'text-brand-success border-brand-success/20 bg-brand-success/5'
+            };
+
+            const alertHTML = `
+                <div class="p-3 rounded-lg border ${colors[template.type]} flex items-start gap-3 animate-fade-in">
+                    <i data-lucide="${template.icon}" class="w-5 h-5 mt-0.5 flex-shrink-0"></i>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <p class="text-sm font-semibold text-slate-200 truncate">${template.title}</p>
+                            <span class="text-xs text-slate-500 whitespace-nowrap ml-2">${time}</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">${template.cam}</p>
+                        <button class="mt-2 text-xs font-medium text-brand-accent hover:text-brand-accentHover flex items-center gap-1 transition-colors">
+                            ${template.action} <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const feed = document.getElementById('alert-feed');
+            feed.insertAdjacentHTML('afterbegin', alertHTML);
+            lucide.createIcons();
+
+            // Mantener solo las últimas 10 alertas para rendimiento
+            if (feed.children.length > 10) {
+                feed.lastElementChild.remove();
             }
 
-            // Buton Animasyonu (İşleniyor hissi)
-            btn.innerText = "ANALİZ EDİLİYOR...";
-            btn.style.opacity = "0.7";
-
-            setTimeout(() => {
-                document.querySelectorAll('.wagon').forEach(w => w.classList.remove('active'));
-                btn.innerText = "EN HIZLI YOLU BUL";
-                btn.style.opacity = "1";
-
-                if (stationData[key]) {
-                    const data = stationData[key];
-                    card.classList.remove('hidden');
-                    document.getElementById('instruction-text').innerText = data.text;
-                    document.getElementById('minutes').innerText = data.save;
-                    document.getElementById(`w${data.wagon}`).classList.add('active');
-                    
-                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    // Veri bulunamadığında da şık bir geri bildirim
-                    alert("Bu rota için optimizasyon çalışması devam ediyor.");
-                }
-            }, 800);
+            // Actualizar contador si es peligro
+            if (template.type === 'danger') {
+                infractionCount++;
+                document.getElementById('infraction-count').textContent = infractionCount;
+            }
         }
+
+        function startSimulation() {
+            if (simulationInterval) return;
+            // Generar una alerta cada 4-8 segundos
+            simulationInterval = setInterval(() => {
+                addAlertToLog();
+            }, Math.random() * 4000 + 4000);
+            
+            // Llenar con algunas alertas iniciales
+            addAlertToLog();
+            setTimeout(addAlertToLog, 1000);
+        }
+
+        function addCamera() {
+            alert("Cámara añadida exitosamente. La IA está calibrando el flujo de video...");
+            navigateTo('dashboard');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Establecer idioma inicial
+            changeLanguage('es');
+            // Actualizar timestamp
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('alert-timestamp').textContent = `Actualizado: ${now.toLocaleTimeString()}`;
+            }, 1000);
+        });
+
     </script>
 </body>
 </html>
